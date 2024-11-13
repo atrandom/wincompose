@@ -12,6 +12,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -166,6 +167,13 @@ public static class KeyboardLayout
             // We need to rebuild the list of dead keys
             AnalyzeLayout();
         }
+        GUITHREADINFO pgui = new GUITHREADINFO();
+        pgui.cbSize = (uint)Marshal.SizeOf(pgui);
+        bool ret = NativeMethods.GetGUIThreadInfo(0, ref pgui);
+        if (ret)
+        {
+            Window.FocusHwnd = pgui.hwndFocus;
+        }
     }
 
     /// <summary>
@@ -283,7 +291,15 @@ public static class KeyboardLayout
         public bool IsOffice { get; private set; }
         public bool IsOtherDesktop { get; private set; }
 
+        public IntPtr FocusHwnd
+        {
+                get => m_f_hwnd;
+                set { m_f_hwnd = value; }
+        }
+
+
         private IntPtr m_hwnd;
+        private IntPtr m_f_hwnd;
     }
 
     public static WindowProperties Window;

@@ -89,12 +89,18 @@ static internal class NativeMethods
             IntPtr InBuffer, int nInBufferSize, out KEYBOARD_INDICATOR_PARAMETERS OutBuffer,
             int nOutBufferSize, out int pBytesReturned, IntPtr Overlapped);
 
-    //
-    // for KeyboardHook.cs
-    //
+    [DllImport("imm32", CharSet = CharSet.Auto)]
+    public static extern IntPtr ImmGetDefaultIMEWnd(IntPtr hwnd);
+    [DllImport("user32")]
+    public static extern int SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+    [DllImport("user32", SetLastError = true)]
+    public static extern bool GetGUIThreadInfo(uint idThread, ref GUITHREADINFO pgui);
+        //
+        // for KeyboardHook.cs
+        //
 
-    /* Imports from kernel32.dll */
-    [DllImport("kernel32", CharSet=CharSet.Ansi, SetLastError=true)]
+        /* Imports from kernel32.dll */
+        [DllImport("kernel32", CharSet=CharSet.Ansi, SetLastError=true)]
     public static extern IntPtr LoadLibrary([MarshalAs(UnmanagedType.LPStr)]string lpFileName);
     [DllImport("kernel32", CharSet=CharSet.Ansi, SetLastError=true, ExactSpelling=true)]
     public static extern UIntPtr GetProcAddress(IntPtr hModule, string procName);

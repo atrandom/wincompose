@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Media;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows.Threading;
 
 namespace WinCompose
@@ -590,7 +591,6 @@ exit_forward_key:
             seq.AddUnicodeInput('\u200b');
             seq.AddKeyEvent(EventType.KeyUpDown, VK.LEFT);
         }
-
         for (int i = 0; i < str.Length; ++i)
         {
             char ch = str[i];
@@ -643,11 +643,34 @@ exit_forward_key:
             seq.AddKeyEvent(EventType.KeyUpDown, VK.RIGHT);
         }
 
-        // Restore keyboard modifier state if we needed one of our custom hacks
-        modifiers.ForEach(vk => seq.AddKeyEvent(EventType.KeyDown, vk));
 
-        // Send the whole keyboard sequence
-        seq.Send();
+        // Check IME open status
+        bool is_ime_enabled = false;
+        IntPtr ime_hwnd = IntPtr.Zero;
+        if (Settings.ControlIME.Value) {
+            ime_hwnd = NativeMethods.ImmGetDefaultIMEWnd(KeyboardLayout.Window.FocusHwnd);
+            is_ime_enabled = (NativeMethods.SendMessage(ime_hwnd, (uint)WMSG.WM_IME_CONTROL, (IntPtr)IMC_COMMAND.IMC_GETOPENSTATUS, IntPtr.Zero) != 0);
+            Logger.Debug("IME open status : {0}", is_ime_enabled ? "open" : "close");
+            if (is_ime_enabled)
+            {
+                // Close IME before send keyboard sequesnce
+                Logger.Debug("Change IME open status");
+                NativeMethods.SendMessage(ime_hwnd, (uint)WMSG.WM_IME_CONTROL, (IntPtr)IMC_COMMAND.IMC_SETOPENSTATUS, IntPtr.Zero);
+            }
+        }
+
+            // Restore keyboard modifier state if we needed one of our custom hacks
+            modifiers.ForEach(vk => seq.AddKeyEvent(EventType.KeyDown, vk));
+
+            // Send the whole keyboard sequence
+            seq.Send();
+
+        // Resume IME open status
+        if (is_ime_enabled && Settings.ControlIME.Value)
+        {
+            Logger.Debug("Resume IME open status");
+            NativeMethods.SendMessage(ime_hwnd, (uint)WMSG.WM_IME_CONTROL, (IntPtr)IMC_COMMAND.IMC_SETOPENSTATUS, (IntPtr)1);
+        }
     }
 
     /// <summary>

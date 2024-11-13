@@ -117,6 +117,8 @@ namespace WinCompose
         public static SettingsEntry<bool> KeepIconVisible { get; } = new SettingsEntry<bool>(false);
         [EntryLocation("tweaks", "disable_icon")]
         public static SettingsEntry<bool> DisableIcon { get; } = new SettingsEntry<bool>(false);
+        [EntryLocation("tweaks", "control_ime")]
+        public static SettingsEntry<bool> ControlIME { get; } = new SettingsEntry<bool>(false);
 
         [EntryLocation("advanced", "ignore_regex")]
         public static SettingsEntry<string> IgnoreRegex { get; } = new SettingsEntry<string>("");

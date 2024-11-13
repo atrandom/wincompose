@@ -505,4 +505,28 @@ internal enum MSGFLT : uint
     REMOVE = 2,
 };
 
+internal enum WMSG : uint
+{
+    WM_IME_CONTROL = 0x0283,
+};
+internal enum IMC_COMMAND : int
+{
+    IMC_GETCONVERSIONMODE = 1,
+    IMC_SETCONVERSIONMODE = 2,
+    IMC_GETOPENSTATUS = 5,
+    IMC_SETOPENSTATUS = 6,
+};
+[StructLayout(LayoutKind.Sequential)]
+internal struct GUITHREADINFO
+{
+    public uint cbSize;
+    public uint flags;
+    public IntPtr hwndActive;
+    public IntPtr hwndFocus;
+    public IntPtr hwndCapture;
+    public IntPtr hwndMenuOwner;
+    public IntPtr hwndMoveSize;
+    public IntPtr hwndCaret;
+    public RECT rcCaret;
+};
 }
